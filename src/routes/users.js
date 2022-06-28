@@ -6,6 +6,7 @@ users.get('/', userController.getAllUsers)
 users.post('/post_body', userController.postUserByIdBody)
 users.post('/post_params', userController.postUserByIdParams)
 users.put('/put', userController.putUserById)
+users.patch('/patch', userController.patchUserById)
 users.delete('/delete', userController.deleteUserById)
 
 module.exports = users

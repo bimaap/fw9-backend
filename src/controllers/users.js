@@ -1,111 +1,99 @@
 // const response = require('../helpers/standard')
 
-let users = [
-    {
-        id: 0,
-        username: 'bima',
-        email: 'bima@gmail.com',
-        password: 'bima123',
-        pin: 123456,
-        money: 1301000.5
-    },
-    {
-        id: 1,
-        username: 'ayu',
-        email: 'ayu@gmail.com',
-        password: 'ayu123',
-        pin: 654321,
-        money: 550200.0
-    },
-    {
-        id: 2,
-        username: 'dimas',
-        email: 'dimas@gmail.com',
-        password: 'dimas123',
-        pin: 321456,
-        money: 2030200.0
-    },
-]
-
+const userModel = require('../models/users')
 
 exports.getAllUsers = (req, res) => {
-    return res.json({
-        success: true,
-        users
+    let sql = `SELECT * FROM users`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
+        return res.json({
+            success: result,
+            value
+        })
     })
 }
 
 exports.postUserByIdBody = (req, res) => {
-    if(users[req.body.id]){
+    let sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.pin}')`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
         return res.json({
-            success: true,
-            user: users[req.body.id]
+            success: result,
+            result: "Data berhasil dibuat"
         })
-    }else{
-        return res.json({
-            success: false,
-            message: 'Data not found'
-        })
-    }
+    })
 }
 
 exports.postUserByIdParams = (req, res) => {
-    if(users[req.query.id]){
+    let sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.query.username}', '${req.query.email}', '${req.query.password}', '${req.query.pin}')`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
         return res.json({
-            success: true,
-            user: users[req.query.id]
+            success: result,
+            result: "Data berhasil dibuat"
         })
-    }else{
-        return res.json({
-            success: false,
-            message: 'Data not found'
-        })
-    }
+    })
 }
 
 exports.patchUserById = (req, res) => {
-    if(users[req.body.id]){
-        users[req.body.id].username = req.body.name
+    let sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id}`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
         return res.json({
-            success: true,
-            user: users[req.body.id]
+            success: result,
+            result: "Data berhasil di update"
         })
-    }else{
-        return res.json({
-            success: false,
-            message: 'Data not found'
-        })
-    }
+    })
 }
 
 exports.putUserById = (req, res) => {
-    if(users[req.body.id]){
-        users[req.body.id].username = req.body.name
-        users[req.body.id].email = req.body.email
-        users[req.body.id].password = req.body.password
+    let sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id}`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
         return res.json({
-            success: true,
-            user: users[req.body.id]
+            success: result,
+            result: "Data berhasil di update (put)"
         })
-    }else{
-        return res.json({
-            success: false,
-            message: 'Data not found'
-        })
-    }
+    })
 }
 
 exports.deleteUserById = (req, res) => {
-    if(users[req.query.id]){
-        users.splice (req.query.id, 1);
+    let sql = `DELETE FROM users WHERE id=${req.query.id}`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
         return res.json({
-            success: true,
-            user: users
+            success: result,
+            result: "Data berhasil di delete"
         })
-    }else{
-        return res.json({
-            success: false,
-            message: 'Data not found'
-        })
-    }
+    })
 }
