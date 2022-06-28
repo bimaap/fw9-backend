@@ -9,7 +9,6 @@ exports.getDataQuery = async (sql, cb) =>{
             cb(false, 'Data tidak ditemukan')
         }
     }catch(err){
-        console.log(err);
         cb(false, err.message)
     }
 }
