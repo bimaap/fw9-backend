@@ -3,7 +3,7 @@
 const userModel = require('../models/users')
 
 exports.getAllUsers = (req, res) => {
-    let sql = `SELECT * FROM users`
+    const sql = `SELECT * FROM users `
     userModel.getDataQuery(sql, (result, value) => {
         if(!result){
             return res.json({
@@ -19,7 +19,7 @@ exports.getAllUsers = (req, res) => {
 }
 
 exports.postUserByIdBody = (req, res) => {
-    let sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.pin}')`
+    const sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.pin}') RETURNING *`
     userModel.getDataQuery(sql, (result, value) => {
         if(!result){
             return res.json({
@@ -29,13 +29,14 @@ exports.postUserByIdBody = (req, res) => {
         }
         return res.json({
             success: result,
-            result: "Data berhasil dibuat"
+            message: "Data berhasil dibuat",
+            result: value[0]
         })
     })
 }
 
 exports.postUserByIdParams = (req, res) => {
-    let sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.query.username}', '${req.query.email}', '${req.query.password}', '${req.query.pin}')`
+    const sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.query.username}', '${req.query.email}', '${req.query.password}', '${req.query.pin}') RETURNING *`
     userModel.getDataQuery(sql, (result, value) => {
         if(!result){
             return res.json({
@@ -45,13 +46,14 @@ exports.postUserByIdParams = (req, res) => {
         }
         return res.json({
             success: result,
-            result: "Data berhasil dibuat"
+            message: "Data berhasil dibuat",
+            result: value[0]
         })
     })
 }
 
 exports.patchUserById = (req, res) => {
-    let sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id}`
+    const sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id} RETURNING *`
     userModel.getDataQuery(sql, (result, value) => {
         if(!result){
             return res.json({
@@ -61,13 +63,14 @@ exports.patchUserById = (req, res) => {
         }
         return res.json({
             success: result,
-            result: "Data berhasil di update"
+            message: "Data berhasil di update",
+            result: value[0]
         })
     })
 }
 
 exports.putUserById = (req, res) => {
-    let sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id}`
+    const sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id} RETURNING *`
     userModel.getDataQuery(sql, (result, value) => {
         if(!result){
             return res.json({
@@ -77,13 +80,14 @@ exports.putUserById = (req, res) => {
         }
         return res.json({
             success: result,
-            result: "Data berhasil di update (put)"
+            message: "Data berhasil di update (put)",
+            result: value[0]
         })
     })
 }
 
 exports.deleteUserById = (req, res) => {
-    let sql = `DELETE FROM users WHERE id=${req.query.id}`
+    const sql = `DELETE FROM users WHERE id=${req.query.id} RETURNING *`
     userModel.getDataQuery(sql, (result, value) => {
         if(!result){
             return res.json({
@@ -93,7 +97,25 @@ exports.deleteUserById = (req, res) => {
         }
         return res.json({
             success: result,
-            result: "Data berhasil di delete"
+            message: "Data berhasil di delete",
+            result: value[0]
+        })
+    })
+}
+
+exports.detailUsers = (req, res) => {
+    const sql = `SELECT * FROM users WHERE id=${req.query.id}`
+    userModel.getDataQuery(sql, (result, value) => {
+        if(!result){
+            return res.json({
+                success: result,
+                result: value
+            })
+        }
+        return res.json({
+            success: result,
+            message: `Detail data ${value[0].username}`,
+            result: value[0]
         })
     })
 }
