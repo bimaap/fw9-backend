@@ -1,5 +1,4 @@
 const {Pool} = require('pg')
-require('dotenv').config()
 
 const {DATABASE_URL: connectionString} = process.env
 
