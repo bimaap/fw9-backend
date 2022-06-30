@@ -1,6 +1,6 @@
 // const response = require('../helpers/standard')
-
 const userModel = require('../models/users')
+const { validationResult } = require('express-validator');
 
 exports.getAllUsers = (req, res) => {
     const sql = `SELECT * FROM users `
@@ -19,20 +19,27 @@ exports.getAllUsers = (req, res) => {
 }
 
 exports.postUserByIdBody = (req, res) => {
-    const sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.pin}') RETURNING *`
-    userModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `INSERT INTO users(username, email, password, pin) VALUES('${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.pin}') RETURNING *`
+        userModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil dibuat",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.postUserByIdParams = (req, res) => {
