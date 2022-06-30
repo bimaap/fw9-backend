@@ -1,6 +1,7 @@
 // const response = require('../helpers/standard')
 
 const profileModel = require('../models/profile')
+const { validationResult } = require('express-validator');
 
 exports.getAllProfile = (req, res) => {
     const sql = `SELECT * FROM profile`
@@ -19,37 +20,51 @@ exports.getAllProfile = (req, res) => {
 }
 
 exports.postProfile = (req, res) => {
-    const sql = `INSERT INTO profile(full_name, phone_number, balance, picture, user_id) VALUES('${req.body.full_name}', '${req.body.phone_number}', '${req.body.balance}', '${req.body.picture}', '${req.body.user_id}') RETURNING *`
-    profileModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `INSERT INTO profile(full_name, phone_number, balance, picture, user_id) VALUES('${req.body.full_name}', '${req.body.phone_number}', '${req.body.balance}', '${req.body.picture}', '${req.body.user_id}') RETURNING *`
+        profileModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil dibuat",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.patchProfile = (req, res) => {
-    const sql = `UPDATE profile SET full_name='${req.body.full_name}' WHERE id=${req.body.id} RETURNING *`
-    profileModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `UPDATE profile SET full_name='${req.body.full_name}', phone_number='${req.body.phone_number}', balance='${req.body.balance}', picture='${req.body.picture}' WHERE id=${req.body.id} RETURNING *`
+        profileModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil di update",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.deleteProfile = (req, res) => {

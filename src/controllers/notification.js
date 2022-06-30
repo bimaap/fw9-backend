@@ -1,6 +1,6 @@
 // const response = require('../helpers/standard')
-
 const notificationModel = require('../models/notification')
+const { validationResult } = require('express-validator');
 
 exports.getAllNotification = (req, res) => {
     const sql = `SELECT * FROM notification`
@@ -19,37 +19,51 @@ exports.getAllNotification = (req, res) => {
 }
 
 exports.postNotification = (req, res) => {
-    const sql = `INSERT INTO notification(amount, notes, type_transaction_id) VALUES('${req.body.amount}', '${req.body.notes}', '${req.body.type_transaction_id}') RETURNING *`
-    notificationModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `INSERT INTO notification(amount, notes, type_transaction_id) VALUES('${req.body.amount}', '${req.body.notes}', '${req.body.type_transaction_id}') RETURNING *`
+        notificationModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil dibuat",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.patchNotification = (req, res) => {
-    const sql = `UPDATE notification SET amount='${req.body.amount}' WHERE id=${req.body.id} RETURNING *`
-    notificationModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `UPDATE notification SET amount='${req.body.amount}',  notes='${req.body.notes}' WHERE id=${req.body.id} RETURNING *`
+        notificationModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil di update",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.deleteNotification = (req, res) => {

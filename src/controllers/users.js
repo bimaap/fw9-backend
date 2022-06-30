@@ -60,20 +60,27 @@ exports.postUserByIdParams = (req, res) => {
 }
 
 exports.patchUserById = (req, res) => {
-    const sql = `UPDATE users SET username='${req.body.username}' WHERE id=${req.body.id} RETURNING *`
-    userModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `UPDATE users SET username='${req.body.username}', email='${req.body.email}', password='${req.body.password}', pin='${req.body.pin}' WHERE id=${req.body.id} RETURNING *`
+        userModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil di update",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.putUserById = (req, res) => {

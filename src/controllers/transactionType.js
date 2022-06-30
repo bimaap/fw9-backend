@@ -1,6 +1,7 @@
 // const response = require('../helpers/standard')
 
 const transactionTypeModel = require('../models/transactionType')
+const { validationResult } = require('express-validator');
 
 exports.getAllTransactionType = (req, res) => {
     const sql = `SELECT * FROM transaction_type`
@@ -19,37 +20,51 @@ exports.getAllTransactionType = (req, res) => {
 }
 
 exports.postTransactionType = (req, res) => {
-    const sql = `INSERT INTO transaction_type(name, description) VALUES('${req.body.name}', '${req.body.description}') RETURNING *`
-    transactionTypeModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `INSERT INTO transaction_type(name, description) VALUES('${req.body.name}', '${req.body.description}') RETURNING *`
+        transactionTypeModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
-                result: value
+                success: result,
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil dibuat",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.patchTransactionType = (req, res) => {
-    console.log(req.body.amount);
-    const sql = `UPDATE transaction_type SET name='${req.body.name}' WHERE id=${req.body.id} RETURNING *`
-    transactionTypeModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    if(validationResult(req).errors.length == 0){
+        const sql = `UPDATE transaction_type SET name='${req.body.name}', description='${req.body.description}' WHERE id=${req.body.id} RETURNING *`
+        transactionTypeModel.getDataQuery(sql, (result, value) => {
+            if(!result){
+                return res.json({
+                    success: result,
+                    result: value
+                })
+            }
             return res.json({
                 success: result,
-                result: value
+                message: "Data berhasil dibuat",
+                result: value[0]
             })
-        }
-        return res.json({
-            success: result,
-            message: "Data berhasil di update",
-            result: value[0]
         })
-    })
+    }else{
+        return res.json({
+            success: false,
+            message: validationResult(req).errors[0].msg
+        }) 
+    }
 }
 
 exports.deleteTransactionType = (req, res) => {
