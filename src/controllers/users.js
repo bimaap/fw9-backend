@@ -3,29 +3,31 @@ const userModel = require('../models/users')
 const { validationResult } = require('express-validator');
 
 exports.getAllUsers = (req, res) => {
-    const [key=''] = req.query.key
-    const [limit=3, page=1] = [req.query.limit, req.query.page]
-    const sql = `SELECT * FROM users WHERE email LIKE \'%${key}%\' ORDER BY id LIMIT ${limit} OFFSET ${page==1?0:(page-1)*limit}`
-
-    userModel.getDataQuery(sql, (result, value) => {
-        if(!result){
+    userModel.getDataQuery(`SELECT * FROM users`, (result2, value2) => {
+        if(!result2){
             return res.json({
-                success: result,
-                message: value
+                success: result2,
+                result: value2
             })
         }
 
-        userModel.getDataQuery(`SELECT * FROM users`, (result2, value2) => {
-            if(!result2){
+        const key = req.query.key || ''
+        const limit = req.query.limit || value2.rowCount
+        const page = req.query.page || 1
+        const sort = req.query.sort || 'ASC'
+
+        const sql = `SELECT * FROM users WHERE email LIKE \'%${key}%\' ORDER BY id ${sort} LIMIT ${key? value2.rowCount:limit} OFFSET ${page==1?0:(page-1)*limit}`
+        userModel.getDataQuery(sql, (result, value) => {
+            if(!result){
                 return res.json({
-                    success: result2,
-                    result: value2
+                    success: result,
+                    message: value
                 })
             }
-
+    
             const pageInfo = {}
             pageInfo.totalData = value2.rowCount
-            pageInfo.totalPage = Math.ceil(value2.rowCount/limit)
+            pageInfo.totalPage = key? 1:Math.ceil(value2.rowCount/limit)
             pageInfo.currentPage = Number(page)
             pageInfo.nextPage = Number(page) < pageInfo.totalPage? Number(page) + 1 : null
             pageInfo.prevPage = Number(page) > 1? Number(page) - 1 : null
