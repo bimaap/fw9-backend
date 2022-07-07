@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 
 const validationUser = [
     check('username').isLength({min:4}).withMessage('Username length min 4'),
-    check('email').isEmail().withMessage('Incorrect email structure'),
+    check('email').isEmail().withMessage('Incorrect email format'),
     check('password')
         .isLength({min:6}).withMessage('Password length min 6')
         .customSanitizer(async (pass)=>{
@@ -14,12 +14,10 @@ const validationUser = [
     check('pin').isLength({min:6, max:6}).withMessage('Pin length must be 6')
 ]
 
-users.get('/', userController.getAllUsers)
-users.post('/post_body', ...validationUser, userController.postUserByIdBody)
-users.post('/post_params', userController.postUserByIdParams)
-users.patch('/patch', ...validationUser, userController.patchUserById)
-users.put('/put', userController.putUserById)
-users.delete('/delete', userController.deleteUserById)
-users.get('/detail', userController.detailUsers)
+users.get('/', userController.getUsers)
+users.post('/', ...validationUser, userController.postUser)
+users.patch('/:id', ...validationUser, userController.patchUser)
+users.delete('/:id', userController.deleteUser)
+users.get('/:id', userController.detailUser)
 
 module.exports = users
