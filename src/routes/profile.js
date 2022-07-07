@@ -11,9 +11,9 @@ const validationUser = [
 ]
 
 profile.get('/', profileController.getAllProfile)
-profile.post('/post', ...validationUser, profileController.postProfile)
-profile.patch('/patch', ...validationUser, profileController.patchProfile)
-profile.delete('/delete', profileController.deleteProfile)
-profile.get('/detail', profileController.detailProfile)
+profile.post('/', ...validationUser, profileController.postProfile)
+profile.patch('/:id', ...validationUser, profileController.patchProfile)
+profile.delete('/:id', profileController.deleteProfile)
+profile.get('/:id', profileController.detailProfile)
 
 module.exports = profile
