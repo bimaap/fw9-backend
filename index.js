@@ -2,6 +2,7 @@ const express = require('express')
 require('dotenv').config()
 
 const app = express()
+global.__basepath = __dirname
 
 app.use(express.urlencoded({extended: false}))
 

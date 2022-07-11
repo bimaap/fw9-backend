@@ -4,9 +4,9 @@ exports.getDataQuery = async (sql, cb) =>{
     try{
         const result = await db.query(sql)
         if(result.rowCount){
-            cb(true, result.rows)
+            cb(result)
         }else{
-            cb(false, 'Data tidak ditemukan')
+            cb(false, 'Data not found')
         }
     }catch(err){
         cb(false, err.message)

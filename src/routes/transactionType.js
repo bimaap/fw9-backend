@@ -8,10 +8,10 @@ const validationUser = [
     check('description').not().isEmpty().withMessage('Description cannot Empty')
 ]
 
-transactionType.get('/', transactionTypeController.getAllTransactionType)
-transactionType.post('/post', ...validationUser, transactionTypeController.postTransactionType)
-transactionType.patch('/patch', ...validationUser, transactionTypeController.patchTransactionType)
-transactionType.delete('/delete', transactionTypeController.deleteTransactionType)
-transactionType.get('/detail', transactionTypeController.detailTransactionType)
+transactionType.get('/transactionType/', transactionTypeController.getAllTransactionType)
+transactionType.post('/transactionType/', ...validationUser, transactionTypeController.postTransactionType)
+transactionType.patch('/transactionType/:id', ...validationUser, transactionTypeController.patchTransactionType)
+transactionType.delete('/transactionType/:id', transactionTypeController.deleteTransactionType)
+transactionType.get('/transactionType/:id', transactionTypeController.detailTransactionType)
 
 module.exports = transactionType

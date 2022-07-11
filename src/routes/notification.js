@@ -4,14 +4,17 @@ const notificationController = require('../controllers/notification')
 const { check } = require('express-validator');
 
 const validationUser = [
-    check('amount').isInt().withMessage('Amount must be number'),
-    check('notes').isLength({min:1}).withMessage('Note cannot empty')
+    check('amount')
+        .not().isEmpty().withMessage('Amount cannot Empty')
+        .isNumeric().withMessage('Amount must be a number'),
+    check('notes')
+        .not().isEmpty().withMessage('Notes cannot Empty')
 ]
 
-notification.get('/', notificationController.getAllNotification)
-notification.post('/post', ...validationUser, notificationController.postNotification)
-notification.patch('/patch', ...validationUser, notificationController.patchNotification)
-notification.delete('/delete', notificationController.deleteNotification)
-notification.get('/detail', notificationController.detailNotification)
+notification.get('/notification/', notificationController.getAllNotification)
+notification.post('/notification/', ...validationUser, notificationController.postNotification)
+notification.patch('/notification/:id', ...validationUser, notificationController.patchNotification)
+notification.delete('/notification/:id', notificationController.deleteNotification)
+notification.get('/notification/:id', notificationController.detailNotification)
 
 module.exports = notification

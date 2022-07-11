@@ -27,38 +27,46 @@ exports.getAllProfile = (req, res) => {
     })
 }
 
-exports.postProfile = (req, res) => {
-    const sql = `SELECT * FROM users WHERE id='${req.body.user_id}'`
-    profileModel.getDataQuery(sql, (result, msg='') => {
-        if(!result) return response(res, 'User ID not registered', null, false, 400);
+const upload = require('../middleware/upload')
 
-        if(validationResult(req).errors.length == 0){
-            const sql2 = `INSERT INTO profile(full_name, phone_number, balance, picture, user_id) VALUES('${req.body.full_name}', '${req.body.phone_number}', '${req.body.balance}', '${req.body.picture}', '${req.body.user_id}') RETURNING *`
-            profileModel.getDataQuery(sql2, (result2, msg2='') => {
-                if(!result2) return response(res, msg2, null, false, 400);
-                return response(res, "Successfully created profile data", result2, false)
+exports.postProfile = (req, res) => {
+    upload(req, res, (err) => {
+        if(!req.file) return response(res, err? err.message:'File cant empty', null, false, 400);
+
+        const sql = `SELECT * FROM users WHERE id='${req.body.user_id}'`
+        profileModel.getDataQuery(sql, (result, msg='') => {
+            if(!result) return response(res, 'User ID not registered', null, false, 400);
+            if(req.body.full_name.length == 0) response(res, 'Full Name cannot Empty', null, false, 400);
+            if(req.body.phone_number.length == 0) response(res, 'Phone Number cannot Empty', null, false, 400);
+            if(req.body.balance.length == 0) response(res, 'Balance cannot Empty', null, false, 400);
+
+            const sql3 = `SELECT * FROM profile WHERE user_id='${req.body.user_id}'`
+            profileModel.getDataQuery(sql3, (result3, msg3='') => {
+                if(result3) return response(res, 'User profile already exists', null, false, 400);
+                
+                const sql2 = `INSERT INTO profile(full_name, phone_number, balance, picture, user_id) VALUES('${req.body.full_name}', '${req.body.phone_number}', '${req.body.balance}', '${req.file.filename}', '${req.body.user_id}') RETURNING *`
+                profileModel.getDataQuery(sql2, (result2, msg2='') => {
+                    if(!result2) return response(res, msg2, null, false, 400);
+                    return response(res, "Successfully created profile data", result2, false)
+                })
             })
-        }else{
-            return response(res, validationResult(req).errors[0].msg, null, false, 400);
-        }
+        })
     })
 }
 
 exports.patchProfile = (req, res) => {
-    const {id} = req.params
-    const sql = `SELECT * FROM profile WHERE id='${req.body.user_id}'`
-    profileModel.getDataQuery(sql, (result, msg='') => {
-        if(!result) return response(res, 'User ID not registered', null, false, 400);
+    upload(req, res, (err) => {
+        if(!req.file) return response(res, err? err.message:'File cant empty', null, false, 400);
+        if(req.body.full_name.length == 0) response(res, 'Full Name cannot Empty', null, false, 400);
+        if(req.body.phone_number.length == 0) response(res, 'Phone Number cannot Empty', null, false, 400);
+        if(req.body.balance.length == 0) response(res, 'Balance cannot Empty', null, false, 400);
 
-        if(validationResult(req).errors.length == 0){
-            const sql2 = `UPDATE profile SET full_name='${req.body.full_name}', phone_number='${req.body.phone_number}', balance='${req.body.balance}', picture='${req.body.picture}' WHERE id=${id} RETURNING *`
-            profileModel.getDataQuery(sql2, (result2, msg2='') => {
-                if(!result2) return response(res, msg2, null, false, 400);
-                return response(res, "Successfully update profile data", result2, false)
-            })
-        }else{
-            return response(res, validationResult(req).errors[0].msg, null, false, 400);
-        }
+        const {id} = req.params
+        const sql2 = `UPDATE profile SET full_name='${req.body.full_name}', phone_number='${req.body.phone_number}', balance='${req.body.balance}', picture='${req.file.filename}' WHERE id=${id} RETURNING *`
+        profileModel.getDataQuery(sql2, (result2, msg2='') => {
+            if(!result2) return response(res, msg2, null, false, 400);
+            return response(res, "Successfully update profile data", result2, false)
+        })
     })
 }
 
